@@ -10,4 +10,5 @@ life and simulated images of traffic signs and traffic situations. The dataset i
 
 The approach
 Since there are two different tasks(to find and to categorize) there are to different approaches. To Find the 
-traffic signs in the image we will use the histograms of oriented gradients
+traffic signs in the image we will use the histograms of oriented gradients, to create the gradients.
+For the detection of the signs we will use CNN for image classification.
