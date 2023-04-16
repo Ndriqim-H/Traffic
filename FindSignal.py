@@ -40,3 +40,42 @@ def genCells(m):
                     cell[k].append(m[i*4+k][j*4+l])
              rez[i][j] = cell    
     return rez
+
+def genHOG(m):
+    rez = []
+    for i in range(0, len(m)):
+        for j in range(0, len(m[0])):
+            h = np.zeros(9)
+            for k in range(0, 4):
+                for l in range(0,4):
+                    print("i: ",i,", j: ",j,", k: ",k,", l: ",l)
+                    if(k == 0): 
+                        a = m[i][j][k][l]
+                        b = m[i][j][k+1][l]
+                    elif(k == 3):
+                        a = m[i][j][k-1][l]
+                        b = m[i][j][k][l]
+                    else:
+                        a = m[i][j][k-1][l]
+                        b = m[i][j][k+1][l]
+
+                    if(l == 0):
+                        c = m[i][j][k][l]
+                        d = m[i][j][k][l+1]
+                    elif(l == 3):
+                        c = m[i][j][k][l-1]
+                        d = m[i][j][k][l]
+                    else:
+                        c = m[i][j][k][l-1]
+                        d = m[i][j][k][l+1]
+
+                    gx = b - a
+                    gy = c - d
+
+                    total = math.sqrt(gx**2 + gy**2)    
+                    orient = math.atan(gy/gx)
+
+                    print("Total: ",total)
+                
+
+            rez.append(h)
