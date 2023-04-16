@@ -79,3 +79,9 @@ def genHOG(m):
                 
 
             rez.append(h)
+
+
+m = genCells(genPixelAvg('img3.jpg',(32,64)))
+print('Size M:',len(m),', ',len(m[0]))
+print(m[0][0])
+genHOG(m)
