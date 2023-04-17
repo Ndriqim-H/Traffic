@@ -1,16 +1,11 @@
 from PIL import Image
 import numpy as np
 import math as math
-  # print(img.size,"Size of Image")
-    # print(img.format," Format of Image")
-    # print(img.mode, "Pixel Mode")
-    # print(img.getpixel((0,0)))
-    # print(pixel_values[0],"Pixel Pixel Values")/
+
 
 def genPixelAvg(filename,size):    
     img = Image.open('./Assets/'+filename)
     img = img.resize(size)
-    # print(img.size,"Size")
     
     if(img.mode == 'RGB' or img.mode == 'RGBA') : 
         # pixel_values = list(img.getdata())
@@ -48,7 +43,7 @@ def genHOG(m):
             h = np.zeros(9)
             for k in range(0, 4):
                 for l in range(0,4):
-                    print("i: ",i,", j: ",j,", k: ",k,", l: ",l)
+                    # print("i: ",i,", j: ",j,", k: ",k,", l: ",l)
                     if(k == 0): 
                         a = m[i][j][k][l]
                         b = m[i][j][k+1][l]
@@ -72,16 +67,30 @@ def genHOG(m):
                     gx = b - a
                     gy = c - d
 
-                    total = math.sqrt(gx**2 + gy**2)    
-                    orient = math.atan(gy/gx)
+                    magnitude = math.sqrt(gx**2 + gy**2)    
+                    
+                    if(gx != 0):
+                       orientation = math.atan(gy/gx)
+                    else:
+                        orientation = 90
+                    
 
-                    print("Total: ",total)
-                
+                    first_bin =math.floor(orientation/20)
+                    second_bin = first_bin + 1
+
+                    
+                    first_bin_degree = first_bin*20
+                    second_bin_degree = second_bin*20
+                   
+                    if(first_bin < 8):
+                        h[first_bin] += (second_bin_degree-orientation)/20 * magnitude
+                        h[second_bin] += (orientation - first_bin_degree)/20 * magnitude
+                    else:
+                        h[8] += magnitude
 
             rez.append(h)
-
+    
+    return rez
 
 m = genCells(genPixelAvg('img3.jpg',(32,64)))
-print('Size M:',len(m),', ',len(m[0]))
-print(m[0][0])
 genHOG(m)
