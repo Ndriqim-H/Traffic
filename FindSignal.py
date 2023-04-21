@@ -4,6 +4,7 @@ import math as math
 import os
 from sklearn.svm import SVC
 import pandas as pd
+# import pickel as pickel
 
 def createArr(val, limit):
     rez = []
@@ -104,31 +105,55 @@ def genHOG(file_name, file_path):
             rez.extend(h)
     
     return rez
+clf_exists = False
+for file in os.listdir():
+    if(file == 'pickle'):
+        clf_exists = True
 
-hogs = []
-classes = []
-signal_files = os.listdir('./Data/Danger')
-for file in signal_files:
-    hogs.append(genHOG(file, './Data/Danger/'))
-    classes.append(1)
+clf = object
 
-other_files = os.listdir('./Data/Other')
-for file in other_files:
-    hogs.append(genHOG(file, './Data/Other/'))
-    classes.append(0)    
+if(clf_exists):
+    clf = pd.read_pickle(filepath_or_buffer="./pickle")
+else:
+# if(not clf):
+    hogs = []
+    classes = []
+
+    exists = False
+    # for file in os.listdir():
+    #     if(file == 'hog.csv'): 
+    #         exists = True
+
+    # if(exists):        
+    #     # hogs = pd.read_csv('hog.csv')
+    #     hogs = np.loadtxt('hog.csv',delimiter=",")
+    #     print(hogs)
+
+    signal_files = os.listdir('./Data/Danger')
+    for file in signal_files:
+        if not exists:
+            hogs.append(genHOG(file, './Data/Danger/'))
+        classes.append(1)
+
+    other_files = os.listdir('./Data/Other')
+    for file in other_files:
+        if not exists:
+            hogs.append(genHOG(file, './Data/Other/'))
+        classes.append(0)    
+
+    if not exists:
+        df = pd.DataFrame(hogs)
+        df.to_csv('hog.csv')
 
 
-# print(hogs)
-# print('\n')
-# print("Klasest:",classes)
+    clf = SVC(kernel='rbf', random_state=0)
+    clf.fit(hogs,classes)
 
-clf = SVC(kernel='rbf', random_state=0)
-clf.fit(hogs,classes)
+    pd.to_pickle(obj=clf,filepath_or_buffer="./pickle")
 
-imageToPredict = [genHOG('image_2001.jpg','./Data/Danger/')]
+imageToPredict = [genHOG('image_6.jpg','./Data/Testing/')]
+# imageToPredict = [genHOG('image_2.png','./Data/Testing/')]
+
 # print(imageToPredict)
 print("Predict",clf.predict(imageToPredict)) 
 
-
-# m = genCells(genPixelAvg('image_2001.jpg',(32,64)))
-# genHOG(m)
