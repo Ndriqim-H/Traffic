@@ -4,7 +4,7 @@ from PIL import Image
 from io import BytesIO
 
 # create a progress bar for the range of URLs to download
-for i in tqdm(range(1, 10000), desc="Downloading images"):
+for i in tqdm(range(1, 20000), desc="Downloading images"):
     url = f"https://www.autoshkollaonline.com/kosove/images/{i}.jpg"
     response = requests.get(url)
 
