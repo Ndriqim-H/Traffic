@@ -4,7 +4,6 @@ import math as math
 import os
 from sklearn.svm import SVC
 import pandas as pd
-# import pickel as pickel
 
 def createArr(val, limit):
     rez = []
@@ -14,7 +13,6 @@ def createArr(val, limit):
     return rez
 
 def genPixelAvg(filename,size,file_path):    
-    # img = Image.open('./Assets/'+filename)
     img = Image.open(file_path+filename)
     img = img.resize(size)
     
@@ -52,11 +50,9 @@ def genHOG(file_name, file_path):
     rez = []
     for i in range(0, len(m)):
         for j in range(0, len(m[0])):
-            # h = np.zeros(9)
             h = createArr(val=0, limit=9)
             for k in range(0, 4):
                 for l in range(0,4):
-                    # print("i: ",i,", j: ",j,", k: ",k,", l: ",l)
                     if(k == 0): 
                         a = m[i][j][k][l]
                         b = m[i][j][k+1][l]
@@ -101,7 +97,6 @@ def genHOG(file_name, file_path):
                     else:
                         h[8] += magnitude
 
-            # rez.append(h)
             rez.extend(h)
     
     return rez
@@ -115,19 +110,10 @@ clf = object
 if(clf_exists):
     clf = pd.read_pickle(filepath_or_buffer="./pickle")
 else:
-# if(not clf):
     hogs = []
     classes = []
 
     exists = False
-    # for file in os.listdir():
-    #     if(file == 'hog.csv'): 
-    #         exists = True
-
-    # if(exists):        
-    #     # hogs = pd.read_csv('hog.csv')
-    #     hogs = np.loadtxt('hog.csv',delimiter=",")
-    #     print(hogs)
 
     signal_files = os.listdir('./Data/Danger')
     for file in signal_files:
@@ -152,8 +138,6 @@ else:
     pd.to_pickle(obj=clf,filepath_or_buffer="./pickle")
 
 imageToPredict = [genHOG('image_6.jpg','./Data/Testing/')]
-# imageToPredict = [genHOG('image_2.png','./Data/Testing/')]
 
-# print(imageToPredict)
 print("Predict",clf.predict(imageToPredict)) 
 
