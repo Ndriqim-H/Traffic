@@ -46,7 +46,7 @@ def genCells(m):
     return rez
 
 def genHOG(file_name, file_path):
-    m = genCells(genPixelAvg(file_name,(32,64), file_path))
+    m = genCells(genPixelAvg(file_name,(32,64), file_path+'/'))
     rez = []
     for i in range(0, len(m)):
         for j in range(0, len(m[0])):
@@ -100,44 +100,78 @@ def genHOG(file_name, file_path):
             rez.extend(h)
     
     return rez
-clf_exists = False
-for file in os.listdir():
-    if(file == 'pickle'):
-        clf_exists = True
 
-clf = object
-
-if(clf_exists):
-    clf = pd.read_pickle(filepath_or_buffer="./pickle")
-else:
+def generateHOG(signs_path_arr= [], other_path_arr = []): 
     hogs = []
     classes = []
 
-    exists = False
+    csv_exists = False
+    for file in os.listdir():
+        if(file == 'hog.csv'):
+            csv_exists = True
+            break
 
-    signal_files = os.listdir('./Data/Danger')
-    for file in signal_files:
-        if not exists:
-            hogs.append(genHOG(file, './Data/Danger/'))
-        classes.append(1)
+    if(csv_exists):    
+        hogs = pd.read_csv('./hog.csv').values
+        classes = np.squeeze(np.asarray(pd.read_csv('./classes.csv').values))   
+    else: 
+        for path in signs_path_arr:
+            signal_files = os.listdir(path)
+            for file in signal_files:
+                hogs.append(genHOG(file, path))
+                classes.append(1)
 
-    other_files = os.listdir('./Data/Other')
-    for file in other_files:
-        if not exists:
-            hogs.append(genHOG(file, './Data/Other/'))
-        classes.append(0)    
+        for path in other_path_arr:
+            other_files = os.listdir(path)
+            for file in other_files:
+                hogs.append(genHOG(file, path))
+                classes.append(0)    
 
-    if not exists:
+        
         df = pd.DataFrame(hogs)
-        df.to_csv('hog.csv')
+        df.to_csv('hog.csv', index=False)
+
+        class_df = pd.DataFrame(classes)
+        class_df.to_csv('classes.csv', index=False)
+
+    
+    return [hogs, classes]
+
+def generateModel(hogs,classes, use_existing):
+    model_exists = False
+    clf = object
+    if(use_existing):
+        for file in os.listdir():
+            if(file == 'pickle'):
+                model_exists = True
+                break
+        if(model_exists):
+            clf = pd.read_pickle(filepath_or_buffer="./pickle")
+    
+    if(not use_existing or not model_exists):    
+        clf = SVC(kernel='rbf', random_state=0)
+        clf.fit(hogs,classes)
+        pd.to_pickle(obj=clf,filepath_or_buffer="./pickle")
+
+    return clf
+
+arr = generateHOG()
+
+generateModel(hogs = arr[0], classes = arr[1], use_existing= True)
+ 
+# path_arr = []
+# count = 0
+# for path in os.listdir('../Data_images/Train'):
+#     if(count == 2):
+#         break
+#     str = '../Data_images/Train/'+ path
+#     path_arr.append(str)
+#     count += 1
 
 
-    clf = SVC(kernel='rbf', random_state=0)
-    clf.fit(hogs,classes)
+# print((generateHOG(signs_path_arr=path_arr, other_path_arr=['./Data/Other']))[1])
 
-    pd.to_pickle(obj=clf,filepath_or_buffer="./pickle")
+# imageToPredict = [genHOG('image_6.jpg','./Data/Testing/')]
 
-imageToPredict = [genHOG('image_6.jpg','./Data/Testing/')]
-
-print("Predict",clf.predict(imageToPredict)) 
+# print("Predict",clf.predict(imageToPredict)) 
 
