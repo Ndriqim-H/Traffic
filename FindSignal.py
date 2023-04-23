@@ -101,7 +101,7 @@ def genHOG(file_name, file_path):
     
     return rez
 
-def generateHOG(signs_path_arr= [], other_path_arr = []): 
+def generateHOG(add_to_existing, signs_path_arr= [], other_path_arr = []): 
     hogs = []
     classes = []
 
@@ -112,14 +112,21 @@ def generateHOG(signs_path_arr= [], other_path_arr = []):
             break
 
     if(csv_exists):    
-        hogs = pd.read_csv('./hog.csv').values
-        classes = np.squeeze(np.asarray(pd.read_csv('./classes.csv').values))   
-    else: 
+        hogs = pd.read_csv('./hog.csv').values.tolist()
+        classes = np.squeeze(np.asarray(pd.read_csv('./classes.csv').values)).tolist()   
+
+
+    # else:
+    if(not csv_exists or add_to_existing): 
         for path in signs_path_arr:
+            count_files = 0
             signal_files = os.listdir(path)
             for file in signal_files:
+                if(count_files >= 10):
+                    break
                 hogs.append(genHOG(file, path))
                 classes.append(1)
+                count_files += 1
 
         for path in other_path_arr:
             other_files = os.listdir(path)
@@ -137,7 +144,7 @@ def generateHOG(signs_path_arr= [], other_path_arr = []):
     
     return [hogs, classes]
 
-def generateModel(hogs,classes, use_existing):
+def generateModel(use_existing, hogs=[], classes=[]):
     model_exists = False
     clf = object
     if(use_existing):
@@ -155,23 +162,37 @@ def generateModel(hogs,classes, use_existing):
 
     return clf
 
-arr = generateHOG()
 
-generateModel(hogs = arr[0], classes = arr[1], use_existing= True)
- 
-# path_arr = []
-# count = 0
-# for path in os.listdir('../Data_images/Train'):
-#     if(count == 2):
-#         break
-#     str = '../Data_images/Train/'+ path
-#     path_arr.append(str)
-#     count += 1
+path_arr = []
+start = 100
+end = 205
+count = 0
+ls_dir = os.listdir('../Data_images/Train')
+num_ls_dir = list(map(int, ls_dir))
+num_ls_dir.sort()
+
+ls_dir = list(map(str, num_ls_dir))
+
+for path in ls_dir:
+    if(count >= end):
+        break
+
+    if(count >= start and count < end):
+        str = '../Data_images/Train/'+ path
+        path_arr.append(str)
+    
+    count += 1
+
+print(path_arr, 'Folders')
+
+# generateHOG(add_to_existing = True, signs_path_arr=path_arr, other_path_arr=['./Data/Other'])
+# generateHOG(add_to_existing = True, signs_path_arr=path_arr, other_path_arr=[])
 
 
-# print((generateHOG(signs_path_arr=path_arr, other_path_arr=['./Data/Other']))[1])
+# arr = generateHOG(add_to_existing=False)
 
-# imageToPredict = [genHOG('image_6.jpg','./Data/Testing/')]
-
-# print("Predict",clf.predict(imageToPredict)) 
+# clf = generateModel(use_existing= True ,hogs = arr[0], classes = arr[1])
+clf = generateModel(use_existing=True) 
+imageToPredict = [genHOG('image_10.jpg','./Data/Testing/')]
+print("Predict",clf.predict(imageToPredict)) 
 
