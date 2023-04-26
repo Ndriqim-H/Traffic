@@ -175,7 +175,10 @@ def findSigns(image_name, image_path):
     m = genPixelAvg(filename = image_name, size=[], file_path = image_path)
     col = math.floor(len(m[0]) / 32)
     row = math.floor(len(m) / 64)
-    mi = subMatrix(m,(0,0), (50,50))
+    for i in range(0, row):
+        for j in range(0, col):
+            mi = subMatrix(m,(i*32,j*64), (i*32 + 32, j*64))
+            
     
     
 
