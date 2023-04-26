@@ -14,7 +14,8 @@ def createArr(val, limit):
 
 def genPixelAvg(filename,size,file_path):    
     img = Image.open(file_path+filename)
-    img = img.resize(size)
+    if(len(size) == 2):
+        img = img.resize(size)
     
     if(img.mode == 'RGB' or img.mode == 'RGBA') : 
         # pixel_values = list(img.getdata())
@@ -161,29 +162,46 @@ def generateModel(use_existing, hogs=[], classes=[]):
         pd.to_pickle(obj=clf,filepath_or_buffer="./pickle")
 
     return clf
+def subMatrix(m, start, end):
+    rez = []
+    for i in range (start[1], end[1]):
+        rez.append([])
+        for j in range(start[0], end[0]):
+            rez[len(rez) - 1].append(m[i][j])
 
-
-path_arr = []
-start = 100
-end = 205
-count = 0
-ls_dir = os.listdir('../Data_images/Train')
-num_ls_dir = list(map(int, ls_dir))
-num_ls_dir.sort()
-
-ls_dir = list(map(str, num_ls_dir))
-
-for path in ls_dir:
-    if(count >= end):
-        break
-
-    if(count >= start and count < end):
-        str = '../Data_images/Train/'+ path
-        path_arr.append(str)
+    return rez
+        
+def findSigns(image_name, image_path):
+    m = genPixelAvg(filename = image_name, size=[], file_path = image_path)
+    col = math.floor(len(m[0]) / 32)
+    row = math.floor(len(m) / 64)
+    mi = subMatrix(m,(0,0), (50,50))
     
-    count += 1
+    
 
-print(path_arr, 'Folders')
+findSigns('image_7.jpg','./Data/Testing/')
+# path_arr = []
+# start = 100
+# end = 205
+# count = 0
+# ls_dir = os.listdir('../Data_images/Train')
+# num_ls_dir = list(map(int, ls_dir))
+# num_ls_dir.sort()
+
+# ls_dir = list(map(str, num_ls_dir))
+
+# for path in ls_dir:
+#     if(count >= end):
+#         break
+
+#     if(count >= start and count < end):
+#         str = '../Data_images/Train/'+ path
+#         path_arr.append(str)
+    
+#     count += 1
+
+# print(path_arr, 'Folders')
+
 
 # generateHOG(add_to_existing = True, signs_path_arr=path_arr, other_path_arr=['./Data/Other'])
 # generateHOG(add_to_existing = True, signs_path_arr=path_arr, other_path_arr=[])
@@ -192,7 +210,8 @@ print(path_arr, 'Folders')
 # arr = generateHOG(add_to_existing=False)
 
 # clf = generateModel(use_existing= True ,hogs = arr[0], classes = arr[1])
-clf = generateModel(use_existing=True) 
-imageToPredict = [genHOG('image_10.jpg','./Data/Testing/')]
-print("Predict",clf.predict(imageToPredict)) 
+
+# clf = generateModel(use_existing=True) 
+# imageToPredict = [genHOG('image_10.jpg','./Data/Testing/')]
+# print("Predict",clf.predict(imageToPredict)) 
 
