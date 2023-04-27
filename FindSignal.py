@@ -46,9 +46,13 @@ def genCells(m):
              rez[i][j] = cell    
     return rez
 
-def genHOG(file_name, file_path):
-    m = genCells(genPixelAvg(file_name,(32,64), file_path+'/'))
+def genHOG(file_name, file_path, matrix = []):
+    if(len(matrix) == 0):
+        m = genCells(genPixelAvg(file_name,(32,64), file_path+'/'))
+    else:
+        m = genCells(matrix)
     rez = []
+    
     for i in range(0, len(m)):
         for j in range(0, len(m[0])):
             h = createArr(val=0, limit=9)
@@ -164,25 +168,34 @@ def generateModel(use_existing, hogs=[], classes=[]):
     return clf
 def subMatrix(m, start, end):
     rez = []
-    for i in range (start[1], end[1]):
+    for i in range (start[0], end[0]):
         rez.append([])
-        for j in range(start[0], end[0]):
+        for j in range(start[1], end[1]):
             rez[len(rez) - 1].append(m[i][j])
 
     return rez
         
-def findSigns(image_name, image_path):
+def findSigns(image_name, image_path, model):
     m = genPixelAvg(filename = image_name, size=[], file_path = image_path)
     col = math.floor(len(m[0]) / 32)
     row = math.floor(len(m) / 64)
     for i in range(0, row):
         for j in range(0, col):
-            mi = subMatrix(m,(i*32,j*64), (i*32 + 32, j*64))
-            
+            # print("Col: ",i*32," Row: ",j*6)
+            mi = subMatrix(m,(i*64,j*32), (i*64 + 64, j*32 + 32))
+            # print("Col: ",len(mi[0])," Row: ", len(mi))
+            hog_to_predict = genHOG('','',matrix=mi)
+            if(model.predict([hog_to_predict])):
+                return [i,j]
+           
+   
     
     
 
-findSigns('image_7.jpg','./Data/Testing/')
+
+img = Image.open('./Data/Testing/image_7.jpg')
+(img.crop((0,0,64,32))).show()
+
 # path_arr = []
 # start = 100
 # end = 205
@@ -214,7 +227,9 @@ findSigns('image_7.jpg','./Data/Testing/')
 
 # clf = generateModel(use_existing= True ,hogs = arr[0], classes = arr[1])
 
-# clf = generateModel(use_existing=True) 
+clf = generateModel(use_existing=True)
+findSigns('image_7.jpg','./Data/Testing/', model=clf)
 # imageToPredict = [genHOG('image_10.jpg','./Data/Testing/')]
 # print("Predict",clf.predict(imageToPredict)) 
+
 
