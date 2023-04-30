@@ -1,1 +1,2 @@
 Traffic Signs Dataset: https://www.kaggle.com/datasets/daniildeltsov/traffic-signs-gtsrb-plus-162-custom-classes
+Other Images: https://www.kaggle.com/datasets/starktony45/image-dataset?select=train2014

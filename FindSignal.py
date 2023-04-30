@@ -181,9 +181,10 @@ def findSigns(image_name, image_path, model):
     row = math.floor(len(m) / 64)
     for i in range(0, row):
         for j in range(0, col):
-            # print("Col: ",i*32," Row: ",j*6)
-            mi = subMatrix(m,(i*64,j*32), (i*64 + 64, j*32 + 32))
-            # print("Col: ",len(mi[0])," Row: ", len(mi))
+            
+            # mi = subMatrix(m,(j*32, i*64), ( i*64 + 64, j*32 + 32))
+            mi = subMatrix(m,(i*64, j*32), ( i*64 + 64, j*32 + 32))
+            print("X: ", len(mi[0]), " Y: ", len(mi))
             hog_to_predict = genHOG('','',matrix=mi)
             if(model.predict([hog_to_predict])):
                 return [i,j]
@@ -193,11 +194,11 @@ def findSigns(image_name, image_path, model):
     
 
 
-img = Image.open('./Data/Testing/image_7.jpg')
-(img.crop((0,0,64,32))).show()
+# img = Image.open('./Data/Testing/image_7.jpg')
+# (img.crop((0,0,64,32))).show()
 
 # path_arr = []
-# start = 100
+# start = 0
 # end = 205
 # count = 0
 # ls_dir = os.listdir('../Data_images/Train')
@@ -219,17 +220,25 @@ img = Image.open('./Data/Testing/image_7.jpg')
 # print(path_arr, 'Folders')
 
 
-# generateHOG(add_to_existing = True, signs_path_arr=path_arr, other_path_arr=['./Data/Other'])
-# generateHOG(add_to_existing = True, signs_path_arr=path_arr, other_path_arr=[])
+# generateHOG(add_to_existing = False, signs_path_arr=path_arr, other_path_arr=['../Others_images'])
+# generateHOG(add_to_existing = True,signs_path_arr=[], other_path_arr=['../Others_images_cropped'])
 
 
 # arr = generateHOG(add_to_existing=False)
-
-# clf = generateModel(use_existing= True ,hogs = arr[0], classes = arr[1])
+# clf = generateModel(use_existing= False ,hogs = arr[0], classes = arr[1])
 
 clf = generateModel(use_existing=True)
-findSigns('image_7.jpg','./Data/Testing/', model=clf)
-# imageToPredict = [genHOG('image_10.jpg','./Data/Testing/')]
-# print("Predict",clf.predict(imageToPredict)) 
+# print("Results: ",findSigns('image_7.jpg','./Data/Testing/', model=clf))
+imageToPredict = [genHOG('image_14.jpg','./Data/Testing/')]
+print("Predict",clf.predict(imageToPredict)) 
 
+# for image in os.listdir('../Others_images'):
+#     img = Image.open('../Others_images/'+image)
+#     img = img.crop((math.floor(img.size[0]/2) - 30, math.floor(img.size[1]/2) - 30, img.size[0] - 30, img.size[1] - 30))
+#     img.save('../Others_images_cropped/'+image)
 
+# img = Image.open('../Others_images/'+'photo-1541958409-7618fd1ad26e.jpg')
+# print("??",(math.floor(img.size[0]/2) - 30, math.floor(img.size[1]/2) - 30, img.size[0] - 30, img.size[1] - 30))
+# img = img.crop((math.floor(img.size[0]/2) - 30, math.floor(img.size[1]/2) - 30, img.size[0] - 30, img.size[1] - 30))
+# # img.show()
+# img.save('../crop_image.jpg')
