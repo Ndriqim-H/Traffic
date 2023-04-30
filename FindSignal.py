@@ -229,7 +229,7 @@ def findSigns(image_name, image_path, model):
 
 clf = generateModel(use_existing=True)
 # print("Results: ",findSigns('image_7.jpg','./Data/Testing/', model=clf))
-imageToPredict = [genHOG('image_14.jpg','./Data/Testing/')]
+imageToPredict = [genHOG('image_7.jpg','./Testing/')]
 print("Predict",clf.predict(imageToPredict)) 
 
 # for image in os.listdir('../Others_images'):
