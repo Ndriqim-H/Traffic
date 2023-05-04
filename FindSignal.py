@@ -196,7 +196,7 @@ def findSigns(image_name, image_path, model):
 
 # img = Image.open('./Data/Testing/image_7.jpg')
 # (img.crop((0,0,64,32))).show()
-
+#
 # path_arr = []
 # start = 0
 # end = 205
