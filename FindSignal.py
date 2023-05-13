@@ -240,5 +240,5 @@ print("Predict",clf.predict(imageToPredict))
 # img = Image.open('../Others_images/'+'photo-1541958409-7618fd1ad26e.jpg')
 # print("??",(math.floor(img.size[0]/2) - 30, math.floor(img.size[1]/2) - 30, img.size[0] - 30, img.size[1] - 30))
 # img = img.crop((math.floor(img.size[0]/2) - 30, math.floor(img.size[1]/2) - 30, img.size[0] - 30, img.size[1] - 30))
-# # img.show()
+
 # img.save('../crop_image.jpg')
