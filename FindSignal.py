@@ -226,7 +226,7 @@ def findSigns(image_name, image_path, model):
 
 # arr = generateHOG(add_to_existing=False)
 # clf = generateModel(use_existing= False ,hogs = arr[0], classes = arr[1])
-
+##
 clf = generateModel(use_existing=True)
 # print("Results: ",findSigns('image_7.jpg','./Data/Testing/', model=clf))
 imageToPredict = [genHOG('image_7.jpg','./Testing/')]
