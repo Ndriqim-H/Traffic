@@ -48,35 +48,37 @@ def genCells(m):
 
 def genHOG(file_name, file_path, matrix = []):
     if(len(matrix) == 0):
-        m = genCells(genPixelAvg(file_name,(32,64), file_path+'/'))
+        m = genCells(genPixelAvg(file_name,(64,128), file_path+'/'))
     else:
         m = genCells(matrix)
     rez = []
-    
+
+    # m = [[[[121, 10], [48, 152]]]]
+
     for i in range(0, len(m)):
         for j in range(0, len(m[0])):
             h = createArr(val=0, limit=9)
             for k in range(0, 4):
                 for l in range(0,4):
                     if(k == 0): 
-                        a = m[i][j][k][l]
-                        b = m[i][j][k+1][l]
-                    elif(k == 3):
-                        a = m[i][j][k-1][l]
-                        b = m[i][j][k][l]
-                    else:
-                        a = m[i][j][k-1][l]
-                        b = m[i][j][k+1][l]
-
-                    if(l == 0):
                         c = m[i][j][k][l]
-                        d = m[i][j][k][l+1]
-                    elif(l == 3):
-                        c = m[i][j][k][l-1]
+                        d = m[i][j][k+1][l]
+                    elif(k == 3):
+                        c = m[i][j][k-1][l]
                         d = m[i][j][k][l]
                     else:
-                        c = m[i][j][k][l-1]
-                        d = m[i][j][k][l+1]
+                        c = m[i][j][k-1][l]
+                        d = m[i][j][k+1][l]
+
+                    if(l == 0):
+                        a = m[i][j][k][l]
+                        b = m[i][j][k][l+1]
+                    elif(l == 3):
+                        a = m[i][j][k][l-1]
+                        b = m[i][j][k][l]
+                    else:
+                        a = m[i][j][k][l-1]
+                        b = m[i][j][k][l+1]
 
                     gx = b - a
                     gy = c - d
@@ -84,10 +86,21 @@ def genHOG(file_name, file_path, matrix = []):
                     magnitude = math.sqrt(gx**2 + gy**2)    
                     
                     if(gx != 0):
-                       orientation = math.atan(gy/gx)
+                       orientation = 90 + math.degrees(math.atan(gy/gx))
+                       
                     else:
                         orientation = 90
                     
+                    # if(i == 0 and j ==0):
+                    #     print("b: ",b)
+                    #     print("a: ",a)
+                    #     print("c: ",c)
+                    #     print("d: ",d)
+                    #     print("Gx: ",gx)
+                    #     print("Gy: ",gy)
+                    #     print("Magnitude: ", magnitude)
+                    #     print("orientation: ", orientation)
+                    #     return
 
                     first_bin =math.floor(orientation/20)
                     second_bin = first_bin + 1
@@ -100,7 +113,7 @@ def genHOG(file_name, file_path, matrix = []):
                         h[first_bin] += math.floor((second_bin_degree-orientation)/20 * magnitude)
                         h[second_bin] += math.floor((orientation - first_bin_degree)/20 * magnitude)
                     else:
-                        h[8] += magnitude
+                        h[8] += math.floor(magnitude)
 
             rez.extend(h)
     
@@ -196,7 +209,7 @@ def findSigns(image_name, image_path, model):
 
 # img = Image.open('./Data/Testing/image_7.jpg')
 # (img.crop((0,0,64,32))).show()
-#
+
 # path_arr = []
 # start = 0
 # end = 205
@@ -227,10 +240,12 @@ def findSigns(image_name, image_path, model):
 # arr = generateHOG(add_to_existing=False)
 # clf = generateModel(use_existing= False ,hogs = arr[0], classes = arr[1])
 ##
+
 clf = generateModel(use_existing=True)
 # print("Results: ",findSigns('image_7.jpg','./Data/Testing/', model=clf))
-imageToPredict = [genHOG('image_7.jpg','./Testing/')]
+imageToPredict = [genHOG('image_11.jpg','./Testing/')]
 print("Predict",clf.predict(imageToPredict)) 
+
 
 # for image in os.listdir('../Others_images'):
 #     img = Image.open('../Others_images/'+image)
