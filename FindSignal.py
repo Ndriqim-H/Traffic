@@ -192,19 +192,28 @@ def subMatrix(m, start, end):
         
 def findSigns(image_name, image_path, model):
     m = genPixelAvg(filename = image_name, size=[], file_path = image_path)
-    col = math.floor(len(m[0]) / 32)
-    row = math.floor(len(m) / 64)
+    col = math.floor(len(m[0]) / 10)
+    row = math.floor(len(m) / 10)
+
     for i in range(0, row):
         for j in range(0, col):
-            
-            # mi = subMatrix(m,(j*32, i*64), ( i*64 + 64, j*32 + 32))
-            mi = subMatrix(m,(i*64, j*32), ( i*64 + 64, j*32 + 32))
-            print("X: ", len(mi[0]), " Y: ", len(mi))
+            mi = subMatrix(m,(i, j), ( i + 128, j + 64))
             hog_to_predict = genHOG('','',matrix=mi)
+
             if(model.predict([hog_to_predict])):
-                return [i,j]
-           
-   
+                return [i,j]      
+    # col = math.floor(len(m[0]) / 64)
+    # row = math.floor(len(m) / 128)
+    # for i in range(0, row):
+    #     for j in range(0, col):
+            
+    #         # mi = subMatrix(m,(j*64, i*128), ( i*128 + 128, j*64 + 64))
+    #         mi = subMatrix(m,(i*128, j*64), ( i*128 + 128, j*64 + 64))
+    #         print("X: ", len(mi[0]), " Y: ", len(mi))
+    #         hog_to_predict = genHOG('','',matrix=mi)
+    #         if(model.predict([hog_to_predict])):
+    #             return [i,j]      
+        
     
     
 
@@ -244,9 +253,9 @@ def findSigns(image_name, image_path, model):
 ##
 
 clf = generateModel(use_existing=True)
-# print("Results: ",findSigns('image_7.jpg','./Data/Testing/', model=clf))
-imageToPredict = [genHOG('image_21.jpg','./Testing/')]
-print("Predict",clf.predict(imageToPredict)) 
+print("Results: ",findSigns('image_7.jpg','./Testing/', model=clf))
+# imageToPredict = [genHOG('image_22.jpg','./Testing/')]
+# print("Predict",clf.predict(imageToPredict)) 
 
 
 # for image in os.listdir('../Others_images'):
