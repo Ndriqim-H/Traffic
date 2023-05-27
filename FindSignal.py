@@ -5,6 +5,8 @@ import os
 from sklearn.svm import SVC
 import pandas as pd
 
+cell_size = 8
+
 def createArr(val, limit):
     rez = []
     for i in range(0, limit):
@@ -31,18 +33,18 @@ def genPixelAvg(filename,size,file_path):
     return avg_matrix
 
 def genCells(m):
-    x = math.floor(len(m[0])/4)
-    y = math.floor(len(m)/4)
+    x = math.floor(len(m[0])/cell_size)
+    y = math.floor(len(m)/cell_size)
     rez = []
     for i in range(0,y):
          rez.append([])
          for j in range(0, x):
              rez[i].append([])
              cell = []
-             for k in range(0,4):
+             for k in range(0,cell_size):
                 cell.append([])
-                for l in range(0,4):
-                    cell[k].append(m[i*4+k][j*4+l])
+                for l in range(0,cell_size):
+                    cell[k].append(m[i*cell_size+k][j*cell_size+l])
              rez[i][j] = cell    
     return rez
 
@@ -58,12 +60,12 @@ def genHOG(file_name, file_path, matrix = []):
     for i in range(0, len(m)):
         for j in range(0, len(m[0])):
             h = createArr(val=0, limit=9)
-            for k in range(0, 4):
-                for l in range(0,4):
+            for k in range(0, cell_size):
+                for l in range(0,cell_size):
                     if(k == 0): 
                         c = m[i][j][k][l]
                         d = m[i][j][k+1][l]
-                    elif(k == 3):
+                    elif(k == cell_size - 1):
                         c = m[i][j][k-1][l]
                         d = m[i][j][k][l]
                     else:
@@ -73,7 +75,7 @@ def genHOG(file_name, file_path, matrix = []):
                     if(l == 0):
                         a = m[i][j][k][l]
                         b = m[i][j][k][l+1]
-                    elif(l == 3):
+                    elif(l ==  cell_size - 1):
                         a = m[i][j][k][l-1]
                         b = m[i][j][k][l]
                     else:
@@ -243,7 +245,7 @@ def findSigns(image_name, image_path, model):
 
 clf = generateModel(use_existing=True)
 # print("Results: ",findSigns('image_7.jpg','./Data/Testing/', model=clf))
-imageToPredict = [genHOG('image_11.jpg','./Testing/')]
+imageToPredict = [genHOG('image_21.jpg','./Testing/')]
 print("Predict",clf.predict(imageToPredict)) 
 
 
