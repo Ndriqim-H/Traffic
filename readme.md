@@ -14,7 +14,8 @@ traffic signs in the image we will use the histograms of oriented gradients, to 
 For the detection of the signs we will use CNN for image classification. Several layers will be applied to the CNN model.
 
 Results of accuracy for locating signals(or the first part). 
-Positive are images that are comprised mostly from a sign and negative are other random images. 
+Positive are images that are comprised mostly from a sign and negative are other random images.
+ 
 ![alt text](https://github.com/Ndriqim-H/Traffic/blob/master/Results_for_Signal_Finding.JPG)
 
 The DL results are for "Danger", "Order", "Other"
