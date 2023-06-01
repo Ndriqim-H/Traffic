@@ -12,3 +12,9 @@ The approach:
 Since there are two different tasks(to find and to categorize) there are to different approaches. To Find the 
 traffic signs in the image we will use the histograms of oriented gradients, to create the gradients.
 For the detection of the signs we will use CNN for image classification. Several layers will be applied to the CNN model.
+
+The DL results are for "Danger", "Order", "Other"
+        D  O  Oth
+       [1, 0, 0],
+       [0, 6, 0],
+       [0, 0, 5]
