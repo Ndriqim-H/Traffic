@@ -39,12 +39,12 @@ def genPixelAvgFromImage(img):
     
     if(img.mode == 'RGB' or img.mode == 'RGBA') : 
         # pixel_values = list(img.getdata())
-        avg_matrix = np.zeros(img.size) 
-        for i in range(0, img.size[0]):
-            for j in range(0, img.size[1]):
+        avg_matrix = np.zeros((img.size[1], img.size[0])) 
+        for i in range(0, img.size[1]):
+            for j in range(0, img.size[0]):
                 sum = 0
                 for k in range (0,3): 
-                    sum += img.getpixel((i,j))[k]
+                    sum += img.getpixel((j, i))[k]
                 sum = sum/3
                 avg_matrix[i][j] = sum
 
@@ -199,7 +199,9 @@ def generateModel(use_existing, hogs=[], classes=[]):
         pd.to_pickle(obj=clf,filepath_or_buffer="./pickle")
 
     return clf
+
 def subMatrix(m, start, end):
+    # print("Start: ",start, " End: ",end)
     rez = []
     for i in range (start[0], end[0]):
         rez.append([])
@@ -209,38 +211,27 @@ def subMatrix(m, start, end):
     return rez
         
 def findSigns(image_name, image_path, model):
-    # m = genPixelAvg(filename = image_name, size=[], file_path = image_path)
-    # col = math.floor(len(m[0]) / 10)
-    # row = math.floor(len(m) / 10)
     main_img = Image.open(image_path+image_name)
-    # main_img.show()
     size = main_img.size
-    col = math.floor(size[0] / 10)
-    row = math.floor(size[1] / 10)
-    
-    for i in range(0, row):
-        for j in range(0, col):
-            img = main_img.crop(j, i, j + 64, i + 128)
-            m = genPixelAvgFromImage(img)
-    for i in range(0, row):
-        for j in range(0, col):
-            img = Image
-            mi = subMatrix(m,(i, j), ( i + 128, j + 64))
-            hog_to_predict = genHOG('','',matrix=mi)
-
-            if(model.predict([hog_to_predict])):
-                return [i,j]      
-    # col = math.floor(len(m[0]) / 64)
-    # row = math.floor(len(m) / 128)
-    # for i in range(0, row):
-    #     for j in range(0, col):
+    step = 10
+    col = math.floor(size[0] / step)
+    row = math.floor(size[1] / step)
+    results = []
+    m = genPixelAvgFromImage(main_img)
+    print("Row: ",len(m), "Col: ",len(m[0]))
+    for i in range(0, row - 14):
+        for j in range(0, col - 7):
             
-    #         # mi = subMatrix(m,(j*64, i*128), ( i*128 + 128, j*64 + 64))
-    #         mi = subMatrix(m,(i*128, j*64), ( i*128 + 128, j*64 + 64))
-    #         print("X: ", len(mi[0]), " Y: ", len(mi))
-    #         hog_to_predict = genHOG('','',matrix=mi)
-    #         if(model.predict([hog_to_predict])):
-    #             return [i,j]      
+            mi = subMatrix(m,(i * step, j * step), ( i * step + 128, j * step + 64))
+            hog_to_predict = genHOG('','',matrix=mi)
+           
+            if(model.predict([hog_to_predict])):
+                # main_img.crop((j * 10, i * 10, j * 10 + 64, i * 10 + 128)).show()
+                # return [i * 10,j * 10] 
+                results.append((i * step, j * step))    
+                # print("Match i:",i * 10," j: ",j * 10) 
+
+    return results        
         
     
 def accuracy( signs_path_arr, other_path_arr, model):
@@ -312,18 +303,16 @@ for path in ls_dir:
 # generateHOG(add_to_existing = True,signs_path_arr=[], other_path_arr=['../Others_images_cropped'])
 
 
-arr = generateHOG(add_to_existing=False)
-clf = generateModel(use_existing= True ,hogs = arr[0], classes = arr[1])
+# arr = generateHOG(add_to_existing=False)
+# clf = generateModel(use_existing= True ,hogs = arr[0], classes = arr[1])
 # print(accuracy(signs_path_arr = [],other_path_arr=['./Images'], model= clf))
-print(accuracy(signs_path_arr = ['../Data_images/Test'],other_path_arr=[], model= clf))
+# print(accuracy(signs_path_arr = ['../Data_images/Test'],other_path_arr=[], model= clf))
+
+clf = generateModel(use_existing=True)
+print("Results: ",findSigns('image_7.jpg','./Testing/', model=clf))
 
 
-# clf = generateModel(use_existing=True)
-# print("Results: ",findSigns('image_7.jpg','./Testing/', model=clf))
 
-# imageToPredict = [genHOG('image_24.jpg','./Testing/')]
-# imageToPredict = [genHOG('00011.png','../Data_images/Test')]
-# print("Predict",clf.predict(imageToPredict)) 
 
 
 # for image in os.listdir('../Others_images'):
@@ -336,3 +325,17 @@ print(accuracy(signs_path_arr = ['../Data_images/Test'],other_path_arr=[], model
 # img = img.crop((math.floor(img.size[0]/2) - 30, math.floor(img.size[1]/2) - 30, img.size[0] - 30, img.size[1] - 30))
 # # img.show()
 # img.save('../crop_image.jpg')
+
+
+###useless code maybe
+    # col = math.floor(len(m[0]) / 64)
+    # row = math.floor(len(m) / 128)
+    # for i in range(0, row):
+    #     for j in range(0, col):
+            
+    #         # mi = subMatrix(m,(j*64, i*128), ( i*128 + 128, j*64 + 64))
+    #         mi = subMatrix(m,(i*128, j*64), ( i*128 + 128, j*64 + 64))
+    #         print("X: ", len(mi[0]), " Y: ", len(mi))
+    #         hog_to_predict = genHOG('','',matrix=mi)
+    #         if(model.predict([hog_to_predict])):
+    #             return [i,j]      
