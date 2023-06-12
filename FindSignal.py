@@ -32,6 +32,24 @@ def genPixelAvg(filename,size,file_path):
 
     return avg_matrix
 
+def genPixelAvgFromImage(img):    
+    # img = Image.open(file_path+filename)
+    # if(len(size) == 2):
+    #     img = img.resize(size)
+    
+    if(img.mode == 'RGB' or img.mode == 'RGBA') : 
+        # pixel_values = list(img.getdata())
+        avg_matrix = np.zeros(img.size) 
+        for i in range(0, img.size[0]):
+            for j in range(0, img.size[1]):
+                sum = 0
+                for k in range (0,3): 
+                    sum += img.getpixel((i,j))[k]
+                sum = sum/3
+                avg_matrix[i][j] = sum
+
+    return avg_matrix
+
 def genCells(m):
     x = math.floor(len(m[0])/cell_size)
     y = math.floor(len(m)/cell_size)
@@ -191,12 +209,22 @@ def subMatrix(m, start, end):
     return rez
         
 def findSigns(image_name, image_path, model):
-    m = genPixelAvg(filename = image_name, size=[], file_path = image_path)
-    col = math.floor(len(m[0]) / 10)
-    row = math.floor(len(m) / 10)
-
+    # m = genPixelAvg(filename = image_name, size=[], file_path = image_path)
+    # col = math.floor(len(m[0]) / 10)
+    # row = math.floor(len(m) / 10)
+    main_img = Image.open(image_path+image_name)
+    # main_img.show()
+    size = main_img.size
+    col = math.floor(size[0] / 10)
+    row = math.floor(size[1] / 10)
+    
     for i in range(0, row):
         for j in range(0, col):
+            img = main_img.crop(j, i, j + 64, i + 128)
+            m = genPixelAvgFromImage(img)
+    for i in range(0, row):
+        for j in range(0, col):
+            img = Image
             mi = subMatrix(m,(i, j), ( i + 128, j + 64))
             hog_to_predict = genHOG('','',matrix=mi)
 
@@ -215,46 +243,86 @@ def findSigns(image_name, image_path, model):
     #             return [i,j]      
         
     
-    
+def accuracy( signs_path_arr, other_path_arr, model):
+    total_instances = 0
+    count_accurate = 0
+    for path in signs_path_arr:
+        count_files = 0
+        signal_files = os.listdir(path)
 
+        for file in signal_files:
+            
+            hog = [genHOG(file, path)]
+            if(model.predict(hog)[0] == 0):
+                count_accurate += 1
+
+            if(count_files > 500):
+                break
+            
+            total_instances += 1
+            count_files += 1
+
+    for path in other_path_arr:
+        count_files = 0
+        other_files = os.listdir(path)
+
+        for file in other_files:
+            hog = [genHOG(file, path)]
+            if(model.predict(hog)[0] == 1):
+                count_accurate += 1
+
+            if(count_files > 390):
+                break
+
+            count_files += 1
+            total_instances += 1
+
+    rez = "Accurate: ",count_accurate,". All: ",total_instances
+    return rez
 
 # img = Image.open('./Data/Testing/image_7.jpg')
 # (img.crop((0,0,64,32))).show()
 
-# path_arr = []
-# start = 0
-# end = 205
-# count = 0
-# ls_dir = os.listdir('../Data_images/Train')
-# num_ls_dir = list(map(int, ls_dir))
-# num_ls_dir.sort()
+path_arr = []
+start = 0
+end = 205
+count = 0
+ls_dir = os.listdir('../Data_images/Train')
+num_ls_dir = list(map(int, ls_dir))
+num_ls_dir.sort()
 
-# ls_dir = list(map(str, num_ls_dir))
+ls_dir = list(map(str, num_ls_dir))
 
-# for path in ls_dir:
-#     if(count >= end):
-#         break
+for path in ls_dir:
+    if(count >= end):
+        break
 
-#     if(count >= start and count < end):
-#         str = '../Data_images/Train/'+ path
-#         path_arr.append(str)
+    if(count >= start and count < end):
+        str = '../Data_images/Train/'+ path
+        path_arr.append(str)
     
-#     count += 1
+    count += 1
+
 
 # print(path_arr, 'Folders')
 
 
-# generateHOG(add_to_existing = False, signs_path_arr=path_arr, other_path_arr=['../Others_images'])
+
+# generateHOG(add_to_existing = False, signs_path_arr=path_arr, other_path_arr=['../Others_images','../Others_images_cropped'])
 # generateHOG(add_to_existing = True,signs_path_arr=[], other_path_arr=['../Others_images_cropped'])
 
 
-# arr = generateHOG(add_to_existing=False)
-# clf = generateModel(use_existing= False ,hogs = arr[0], classes = arr[1])
-##
+arr = generateHOG(add_to_existing=False)
+clf = generateModel(use_existing= True ,hogs = arr[0], classes = arr[1])
+# print(accuracy(signs_path_arr = [],other_path_arr=['./Images'], model= clf))
+print(accuracy(signs_path_arr = ['../Data_images/Test'],other_path_arr=[], model= clf))
 
-clf = generateModel(use_existing=True)
-print("Results: ",findSigns('image_7.jpg','./Testing/', model=clf))
-# imageToPredict = [genHOG('image_22.jpg','./Testing/')]
+
+# clf = generateModel(use_existing=True)
+# print("Results: ",findSigns('image_7.jpg','./Testing/', model=clf))
+
+# imageToPredict = [genHOG('image_24.jpg','./Testing/')]
+# imageToPredict = [genHOG('00011.png','../Data_images/Test')]
 # print("Predict",clf.predict(imageToPredict)) 
 
 
